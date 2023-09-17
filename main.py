@@ -1,6 +1,7 @@
 import pygame
 from pygame.locals import *
 import random
+from pygame import mixer
 
 pygame.init()
 
@@ -30,9 +31,8 @@ last_pipe = pygame.time.get_ticks() - pipe_frequency
 score = 0
 pass_pipe = False
 
-#high score
-
-
+#load sound effect 
+jump = mixer.Sound('jump.wav')
 
 #load images
 bg = pygame.image.load('background.png')
@@ -82,6 +82,7 @@ class Bird(pygame.sprite.Sprite):
         if game_over == False:
             #jump
             if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
+                jump.play()
                 self.clicked = True
                 self.vel = -10
             if pygame.mouse.get_pressed()[0] == 0:
@@ -140,6 +141,8 @@ class Button():
         if self.rect.collidepoint(pos):
             if pygame.mouse.get_pressed()[0] == 1:
                 action = True
+                if game_over:
+                    jump.stop()
 
         #draw button
         screen.blit(self.image, (self.rect.x, self.rect.y))
@@ -173,6 +176,8 @@ while run:
     #draw the ground
     screen.blit(ground_img, (ground_scroll, 768))
 
+    #high score
+    draw_text((f"high score: {high_score}"), font, white, 320, 20)
 
     #check the score
     if len(pipe_group) > 0:
@@ -237,7 +242,6 @@ while run:
         if event.type == pygame.MOUSEBUTTONDOWN and flying == False and game_over == False:
             flying = True
 
-    draw_text((f"high score: {high_score}"), font, white, 320, 20)
 
     pygame.display.update()
 

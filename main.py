@@ -2,8 +2,19 @@ import pygame
 from pygame.locals import *
 import random
 from pygame import mixer
+from easygui import *
+
+#select theme
+text = "Select your theme."
+title = "Theme"
+choices = ["scary", "normal"]
+output = choicebox(text, title, choices)
 
 pygame.init()
+mixer.init()
+
+#load sound effects
+jump = mixer.Sound("jump.wav")
 
 clock = pygame.time.Clock()
 fps = 60
@@ -31,11 +42,12 @@ last_pipe = pygame.time.get_ticks() - pipe_frequency
 score = 0
 pass_pipe = False
 
-#load sound effect 
-jump = mixer.Sound('jump.wav')
 
 #load images
-bg = pygame.image.load('background.png')
+if output == "normal":
+    bg = pygame.image.load('background.png')
+else:
+    bg = pygame.image.load('scary_bg.png')
 ground_img = pygame.image.load('ground.png')
 button_img = pygame.image.load('restart.png')
 
@@ -109,7 +121,10 @@ class Bird(pygame.sprite.Sprite):
 class Pipe(pygame.sprite.Sprite):
     def __init__(self, x, y, position):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load('pipe.png')
+        if output == "normal":
+            self.image = pygame.image.load('pipe.png')
+        else:
+            self.image = pygame.image.load('scary_pipe.png')
         self.rect = self.image.get_rect()
         #position 1 is from the top, -1 is from the bottom
         if position == 1:
@@ -141,8 +156,6 @@ class Button():
         if self.rect.collidepoint(pos):
             if pygame.mouse.get_pressed()[0] == 1:
                 action = True
-                if game_over:
-                    jump.stop()
 
         #draw button
         screen.blit(self.image, (self.rect.x, self.rect.y))
@@ -176,8 +189,6 @@ while run:
     #draw the ground
     screen.blit(ground_img, (ground_scroll, 768))
 
-    #high score
-    draw_text((f"high score: {high_score}"), font, white, 320, 20)
 
     #check the score
     if len(pipe_group) > 0:
@@ -242,6 +253,7 @@ while run:
         if event.type == pygame.MOUSEBUTTONDOWN and flying == False and game_over == False:
             flying = True
 
+    draw_text((f"high score: {high_score}"), font, white, 320, 20)
 
     pygame.display.update()
 
